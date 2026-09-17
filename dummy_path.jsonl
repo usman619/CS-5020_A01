@@ -1,0 +1,7 @@
+{"ts": 1789656333.41, "event": "bootstrap_incident", "payload": {"status": "ok", "incident_id": "INC-123"}}
+{"ts": 1789656333.41, "event": "plan_created", "payload": {"plan": "AgentPlan(hypothesis='Test hypothesis', steps=[PlanStep(step_id='S1', objective='Test objective', success_signal='Test signal', status='pending')], revision=1, rationale_summary='Test rationale')"}}
+{"ts": 1789656333.41, "event": "model_reply", "payload": {"content": "Verifying.", "tool_calls": [{"name": "verify_recovery", "arguments": {}}]}}
+{"ts": 1789656333.41, "event": "tool_result", "payload": {"call": {"name": "verify_recovery", "arguments": {}}, "result": {"status": "ok", "criteria_met": false, "name": "verify_recovery"}}}
+{"ts": 1789656333.41, "event": "plan_revision_failed", "payload": {"error": "json_validate_failed"}}
+{"ts": 1789656333.41, "event": "model_reply", "payload": {"content": "Escalating.", "tool_calls": [{"name": "escalate_incident", "arguments": {}}]}}
+{"ts": 1789656333.41, "event": "tool_result", "payload": {"call": {"name": "escalate_incident", "arguments": {}}, "result": {"status": "ok"}}}

@@ -1,0 +1,13 @@
+.venv/
+.vscode/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+.env
+*.pyc
+*.pyo
+*.log
+traces/*.jsonl
+artifacts/
+.DS_Store
+assignment_a.pdf
