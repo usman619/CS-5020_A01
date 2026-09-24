@@ -13,4 +13,7 @@ Rules:
 10. Do not request internet access, shell access, code execution, MCP, or any external API. All operational tools are local.
 
 Your job is to investigate, mitigate, verify, and either close or escalate the incident safely.
+
+CRITICAL TOOL CALLING RULES:
+If a tool requires zero arguments, you must supply exactly {}. Never use nested structures, blank string keys (like {"": ""}), or null values.
 """

@@ -7,7 +7,8 @@ __pycache__/
 *.pyc
 *.pyo
 *.log
-traces/*.jsonl
+# traces/*.jsonl
+# traces/first_run/*.jsonl
 artifacts/
 .DS_Store
 assignment_a.pdf

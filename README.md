@@ -19,10 +19,21 @@ copy .env.example .env   # Windows CMD
 
 Put your own key in `.env` or set `GROQ_API_KEY` in the shell. **Never submit the key.**
 
-Generate your deterministic public scenario:
+Generate your deterministic public scenarios (public-a, public-b and public-c) each time for the specific scenario you want to test on before running the main command:<br>
 
+**For public-a:**
 ```bash
-python scripts/generate_student_scenario.py --student-id 22I-1234 --scenario public-a
+python scripts/generate_student_scenario.py --student-id 25I-7605 --scenario public-a
+```
+
+**For public-b:**
+```bash
+python scripts/generate_student_scenario.py --student-id 25I-7605 --scenario public-b
+```
+
+**For public-c:**
+```bash
+python scripts/generate_student_scenario.py --student-id 25I-7605 --scenario public-c
 ```
 
 Validate the protected infrastructure (does not call Groq):
@@ -41,11 +52,28 @@ pytest -q tests/public
 
 Several student-requirement tests are expected to fail in the untouched starter. They are specifications, not bugs in the simulator.
 
+The additional 10 test cases are located inside the `tests/public/test_student_requirements.py` file.
 Live run with Groq:
 
+**For public-a:**
 ```bash
-python -m incidentzero.cli run --student-id 22I-1234 --scenario public-a --model openai/gpt-oss-20b
+python -m incidentzero.cli run --student-id 25I-7605 --scenario public-a --model openai/gpt-oss-20b
 ```
+
+**For public-b:**
+```bash
+python -m incidentzero.cli run --student-id 25I-7605 --scenario public-b --model openai/gpt-oss-20b
+```
+
+**For public-c:**
+```bash
+python -m incidentzero.cli run --student-id 25I-7605 --scenario public-c --model openai/gpt-oss-20b
+```
+After running each scenario you can find its traces in  `traces/`folder.
+
+
+## Report and AI Usage
+The Assignment Report and AI Usage are available in the `docs/` folder.
 
 ## Stable contract
 

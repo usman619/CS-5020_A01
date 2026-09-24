@@ -17,7 +17,6 @@ from .recovery import RetryPolicy
 from .state import AgentState
 
 from incidentzero.model.errors import PermanentModelError
-
 class AgentController:
     """Hardened SRE incident commander controller.
 
@@ -52,30 +51,15 @@ class AgentController:
     def _model_decide(self) -> ModelReply:
         """
         Task C: Bounded model retries.
-        Implements bounded retries for transient model failures (e.g., Groq HTTP 429)
-        while correctly accounting for the call budget per attempt.
+        Delegates to RetryPolicy to correctly handle Transient vs Permanent errors.
         """
-        max_attempts = getattr(self.retry_policy, "max_attempts", 3)
-        last_error = None
-        
-        for attempt in range(max_attempts):
+        def _call():
             self.budget.consume_llm()
-            try:
-                # Return successfully generated ModelReply
-                return self.model.decide(self.state.messages, self.tools.groq_tools)
-            except Exception as e:
-                last_error = e
-                self.trace.record("model_error", {"attempt": attempt, "error": str(e)})
-                
-                # If we've exhausted retries, break out to raise the error
-                if attempt == max_attempts - 1:
-                    break
-                    
-                # Task C: Bounded backoff sleep implementation
-                if hasattr(self.retry_policy, "sleep"):
-                    self.retry_policy.sleep(attempt)
-                    
-        raise RuntimeError(f"Model retry budget exhausted. Last error: {last_error}")
+            return self.model.decide(self.state.messages, self.tools.groq_tools)
+            
+        # The retry_policy will automatically handle TransientModelError
+        # and let PermanentModelError bubble up.
+        return self.retry_policy.call_model(_call)
 
     def _execute_tool_call(self, call: ToolCall) -> dict[str, Any]:
         """
@@ -195,7 +179,20 @@ class AgentController:
 
             # The main autonomous incident commander loop
             while self.budget.remaining_llm > 0 and self.budget.remaining_tools > 0:
-                reply = self._model_decide()
+                try:
+                    reply = self._model_decide()
+                except PermanentModelError as e:
+                    # Catch Groq 400 errors (malformed tool JSON) without crashing
+                    self.trace.record("model_syntax_error", {"error": str(e)})
+                    self.state.messages.append({
+                        "role": "system",
+                        "content": (
+                            "SYSTEM WARNING: Your tool call was rejected by the API due to invalid JSON syntax. "
+                            "If a tool requires zero arguments (e.g., verify_recovery, close_incident), "
+                            "you MUST pass an empty JSON object: {}. Do not use nested structures or empty string keys."
+                        )
+                    })
+                    continue
                 self._append_assistant(reply)
                 self.trace.record("model_reply", {"content": reply.content, "tool_calls": [c.__dict__ if hasattr(c, "__dict__") else {"name": c.name, "arguments": c.arguments} for c in reply.tool_calls]})
 
